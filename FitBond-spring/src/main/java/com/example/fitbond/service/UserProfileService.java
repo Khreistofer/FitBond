@@ -1,6 +1,6 @@
-package com.example.demo.service;
+package com.example.fitbond.service;
 import com.example.fitbond.User_Profile;
-import com.example.demo.repository.UserProfileRepository;
+import com.example.fitbond.repository.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

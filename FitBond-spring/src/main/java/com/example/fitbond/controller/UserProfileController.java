@@ -1,7 +1,7 @@
-package com.example.demo.controller;
+package com.example.fitbond.controller;
 
 import com.example.fitbond.User_Profile;
-import com.example.demo.service.UserProfileService;
+import com.example.fitbond.service.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

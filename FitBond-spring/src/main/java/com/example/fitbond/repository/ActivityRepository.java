@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.fitbond.repository;
 import com.example.fitbond.Activity;
 import com.example.fitbond.Sport_Type;
 import org.springframework.data.jpa.repository.JpaRepository;

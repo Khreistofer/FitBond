@@ -1,9 +1,9 @@
-package com.example.demo.service;
+package com.example.fitbond.service;
 import com.example.fitbond.Activity;
 import com.example.fitbond.Sport_Type;
 import com.example.fitbond.User;
-import com.example.demo.repository.ActivityRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.fitbond.repository.ActivityRepository;
+import com.example.fitbond.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
