@@ -2,7 +2,9 @@ package com.example.fitbond.service;
 import com.example.fitbond.Activity;
 import com.example.fitbond.Sport_Type;
 import com.example.fitbond.User;
+import com.example.fitbond.dto.WeeklyStatDTO;
 import com.example.fitbond.repository.ActivityRepository;
+import com.example.fitbond.repository.FriendshipRepository;
 import com.example.fitbond.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ActivityService {
@@ -20,6 +23,9 @@ public class ActivityService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FriendshipRepository friendshipRepository;
 
     private final WebClient webClient = WebClient.create("https://api.open-meteo.com");
 
@@ -76,6 +82,37 @@ public class ActivityService {
         } catch (Exception e) {
             return "{\"error\": \"Weather API unavailable\"}";
         }
+    }
+
+    public List<Activity> getActivityFeed(int userId) {
+        // Get user's own activities + all friends' activities
+        List<Integer> friendIds = friendshipRepository.findByUserId(userId)
+                .stream().map(f -> f.getFriend().getId()).collect(Collectors.toList());
+        friendIds.add(userId); // include self
+
+        return activityRepository.findAll().stream()
+                .filter(a -> friendIds.contains(a.getUser().getId()))
+                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
+                .collect(Collectors.toList());
+    }
+
+    public List<WeeklyStatDTO> getWeeklyStats(int userId) {
+        LocalDateTime monday = LocalDateTime.now()
+                .with(java.time.DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
+        LocalDateTime sunday = monday.plusDays(6).withHour(23).withMinute(59);
+
+        List<Activity> weekActivities = activityRepository
+                .findByUserIdAndStartTimeBetween(userId, monday, sunday);
+
+        String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        return java.util.Arrays.stream(days).map(day -> {
+            int idx = java.util.List.of(days).indexOf(day);
+            double km = weekActivities.stream()
+                    .filter(a -> a.getStartTime().getDayOfWeek().getValue() - 1 == idx)
+                    .mapToDouble(a -> a.getDistanceKm() != null ? a.getDistanceKm() : 0)
+                    .sum();
+            return new WeeklyStatDTO(day, km);
+        }).collect(java.util.stream.Collectors.toList());
     }
 
     public List<Activity> getActivitiesByUserId(int userId) {

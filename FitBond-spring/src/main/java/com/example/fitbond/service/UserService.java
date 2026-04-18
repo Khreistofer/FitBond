@@ -20,6 +20,25 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User addPoints(int userId, int pointsToAdd) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPoints(user.getPoints() + pointsToAdd);
+        user.setUpdated_at(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    public User addBadge(int userId, String badge) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!user.getBadges().contains(badge)) {
+            user.getBadges().add(badge);
+            user.setUpdated_at(LocalDateTime.now());
+            userRepository.save(user);
+        }
+        return user;
+    }
+
     public Optional<User> getUserById(int id) {
         return userRepository.findById(id);
     }
