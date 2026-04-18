@@ -1,5 +1,6 @@
 package com.example.fitbond.controller;
 import com.example.fitbond.Activity;
+import com.example.fitbond.dto.WeeklyStatDTO;
 import com.example.fitbond.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/activities")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ActivityController {
 
     @Autowired
@@ -33,5 +34,15 @@ public class ActivityController {
         return activityService.getActivityById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/feed")
+    public List<Activity> getActivityFeed(@RequestParam int userId) {
+        return activityService.getActivityFeed(userId);
+    }
+
+    @GetMapping("/stats/weekly")
+    public List<WeeklyStatDTO> getWeeklyStats(@RequestParam int userId) {
+        return activityService.getWeeklyStats(userId);
     }
 }

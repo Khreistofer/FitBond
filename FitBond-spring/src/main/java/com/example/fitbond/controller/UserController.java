@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")   // for React later
+@CrossOrigin(origins = "http://localhost:5173")  // for React later
 public class UserController {
 
     @Autowired
@@ -26,6 +26,16 @@ public class UserController {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/points")
+    public ResponseEntity<User> addPoints(@PathVariable int id, @RequestParam int points) {
+        return ResponseEntity.ok(userService.addPoints(id, points));
+    }
+
+    @PutMapping("/{id}/badges")
+    public ResponseEntity<User> addBadge(@PathVariable int id, @RequestParam String badge) {
+        return ResponseEntity.ok(userService.addBadge(id, badge));
     }
 
     @GetMapping
