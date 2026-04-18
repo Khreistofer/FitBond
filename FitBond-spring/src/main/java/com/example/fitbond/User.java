@@ -18,6 +18,11 @@ public class User {
     private String email;
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
+    private int points = 0;
+    @ElementCollection
+    @CollectionTable(name = "user_badges", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "badge")
+    private List<String> badges = new ArrayList<>();
     // Relationships
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private User_Profile profile;
@@ -78,4 +83,10 @@ public class User {
     public void setActivities(List<Activity> activities) {
         this.activities = activities;
     }
+
+    public int getPoints() { return points; }
+    public void setPoints(int points) { this.points = points; }
+
+    public List<String> getBadges() { return badges; }
+    public void setBadges(List<String> badges) { this.badges = badges; }
 }
