@@ -8,6 +8,29 @@ import Profile from "./Profile.jsx";
 
 import { CURRENT_USER, FRIENDS, ACTIVITIES, CHALLENGES, WEEKLY_STATS, C } from "./assets/mockdata.js";
 
+import { Login, Signup } from "./Auth";
+
+export default function App() {
+  const [authView, setAuthView] = useState("login"); // "login" | "signup"
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("fitbond_user")); }
+    catch { return null; }
+  });
+
+  const logout = () => {
+    localStorage.removeItem("fitbond_token");
+    localStorage.removeItem("fitbond_user");
+    setUser(null); setAuthView("login");
+  };
+
+  if (!user && authView === "login")
+    return <Login  onLoginSuccess={setUser}  onGoToSignup={() => setAuthView("signup")} />;
+  if (!user && authView === "signup")
+    return <Signup onSignupSuccess={setUser} onGoToLogin={() => setAuthView("login")}  />;
+
+  return <MainApp user={user} onLogout={logout} />;
+}
+
 const PAGES = {
   dashboard: Dashboard,
   activities: ActivityLog,
@@ -15,35 +38,3 @@ const PAGES = {
   challenges: Challenges,
   profile: Profile,
 };
-
-export default function App() {
-  const [page, setPage] = useState(() => localStorage.getItem("page") || "dashboard");
-  const Page = PAGES[page] || Dashboard;
-
-  useEffect(() => {
-    localStorage.setItem("page", page);
-  }, [page]);
-
-  return (
-    <div style={{
-      display: "flex",
-      minHeight: "100vh",
-      background: "#f4f6f8",
-      fontFamily: "'DM Sans','Segoe UI',sans-serif",
-      color: "#0d1117",
-    }}>
-      <Sidebar page={page} setPage={setPage} />
-
-      <main style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        minWidth: 0,
-        overflowY: "auto",
-        maxHeight: "100vh"
-      }}>
-        <Page />
-      </main>
-    </div>
-  );
-}
