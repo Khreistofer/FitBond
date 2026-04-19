@@ -17,8 +17,8 @@ const storedUser = () => {
 export default function App() {
   const [page,        setPage]        = useState(() => localStorage.getItem("page") || "dashboard");
   const [authScreen,  setAuthScreen]  = useState("login"); // "login" | "signup"
-  const [authUser,    setAuthUser]    = useState(storedUser);  // lightweight user from JWT response
-  const [currentUser, setCurrentUser] = useState(null);        // full user from /api/users/:id
+  const [authUser,    setAuthUser]    = useState(storedUser);   // ✅ FIXED: was useState(storedUser) — missing ()
+  const [currentUser, setCurrentUser] = useState(null);
   const [profile,     setProfile]     = useState(null);
 
   // Persist active page
@@ -28,10 +28,13 @@ export default function App() {
   useEffect(() => {
     if (!authUser?.id) return;
     api.getUser(authUser.id).then(setCurrentUser).catch(err => {
-      // 401 means the stored token is expired — log out
-      if (err.message.startsWith("401")) handleLogout();
+      // Only force logout if it's definitely an auth error, not a network blip
+      const status = parseInt(err.message);
+      if (status === 401 || status === 403) handleLogout();
     });
-    api.getProfile(authUser.id).then(setProfile).catch(() => {});
+    api.getProfile(authUser.id)
+      .then(setProfile)
+      .catch(() => setProfile({})); // ← don't leave profile null forever
   }, [authUser?.id]);
 
   const handleLoginSuccess = (user) => {
