@@ -42,17 +42,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (jwtUtil.isValid(token)) {
             String username = jwtUtil.extractUsername(token);
-
-            // Only set auth if not already authenticated in this request
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                try {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                } catch (Exception ignored) {
+                    // token valid but user not found — just skip setting auth
+                }
             }
         }
-
         chain.doFilter(request, response);
     }
 }
