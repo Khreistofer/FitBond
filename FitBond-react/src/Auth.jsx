@@ -290,10 +290,10 @@ export const Signup = ({ onSignupSuccess, onGoToLogin }) => {
         height_cm:        Number(form.height),
         weight_kg:        Number(form.weight),
         age:              Number(form.age),
-        sex:              form.sex,
-        level:            form.fitnessLevel,
+        sex:              form.sex.toUpperCase(),
+        level:            form.fitnessLevel.toUpperCase(),
         goal:             form.goal,
-        sportPreferences: form.sports,
+        sportPreferences: form.sports.map(sport => sport.toUpperCase()),
       });
 
       onSignupSuccess(user);
