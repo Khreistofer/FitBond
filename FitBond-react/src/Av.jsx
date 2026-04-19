@@ -1,4 +1,4 @@
-import { CURRENT_USER, FRIENDS, ACTIVITIES, CHALLENGES, WEEKLY_STATS, C } from "./assets/mockdata.js";
+import { SPORT_TYPES, C } from "./assets/constants.js";
 
 export default function Av({ initials, size = 36, bg = "#05b4df" }) { return (
   <div style={{

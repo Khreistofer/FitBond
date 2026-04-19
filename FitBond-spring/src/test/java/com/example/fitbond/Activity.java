@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.fitbond;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

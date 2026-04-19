@@ -6,17 +6,27 @@ import Card from './Card.jsx'
 import Btn from './Btn.jsx'
 import Tag from './Tag.jsx'
 
-import { CURRENT_USER, FRIENDS, ACTIVITIES, CHALLENGES, WEEKLY_STATS, C } from "./assets/mockdata.js";
+import { api } from './assets/api.js'
+import { C } from "./assets/constants.js";
 
-export default function Challenges() 
-{
-  const [tab, setTab] = useState("all");
-  const filtered = tab === "mine" ? CHALLENGES.filter(c => c.joined) : CHALLENGES;
+export default function Challenges({ currentUser }) {
+  const [challenges, setChallenges] = useState([]);
+  const [tab, setTab]               = useState("all");
+
+  useEffect(() => {
+    api.getChallenges(currentUser.id).then(setChallenges);
+  }, [currentUser.id]);
+
+  const filtered = tab === "mine" ? challenges.filter(c => c.joined) : challenges;
+
+  const handleJoin = async (c) => {
+    const updated = await api.joinChallenge(c.id, currentUser.id, c.target || 100);
+    setChallenges(prev => prev.map(ch => ch.id === c.id ? updated : ch));
+  };
 
   return (
     <div>
-      <Topbar title="Challenges" action={<Btn variant="accent" size="sm">+ Create Challenge</Btn>} />
-      {/* PLACEHOLDER: POST /api/challenges */}
+      <Topbar title="Challenges" action={<Btn variant="accent" size="sm">+ Create Challenge</Btn>} currentUser={currentUser} />
       <div style={{ padding:"2rem", display:"flex", flexDirection:"column", gap:"1.5rem" }}>
         <div style={{ display:"flex", gap:8 }}>
           {[["all","All Challenges"],["mine","My Challenges"]].map(([id, label]) => (
@@ -29,16 +39,20 @@ export default function Challenges()
           ))}
         </div>
 
+        {filtered.length === 0 && <div style={{ color:C.muted, fontSize:13 }}>No challenges found.</div>}
+
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }}>
           {filtered.map(c => (
-            <Card key={c.id} style={{ borderTop: `4px solid ${c.joined ? C.brand : C.border}` }}>
+            <Card key={c.id} style={{ borderTop:`4px solid ${c.joined ? C.brand : C.border}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1rem" }}>
                 <div>
                   <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, lineHeight:1.3 }}>{c.title}</div>
                   <div style={{ fontSize:12, color:C.muted, marginTop:4 }}>{c.metric} · Ends {c.ends} · 👥 {c.participants}</div>
                 </div>
-                {c.joined ? <Tag color="brand">Joined</Tag> : <Btn size="sm" variant="outline">Join</Btn>}
-                {/* PLACEHOLDER: POST /api/challenges/:id/join */}
+                {c.joined
+                  ? <Tag color="brand">Joined</Tag>
+                  : <Btn size="sm" variant="outline" onClick={() => handleJoin(c)}>Join</Btn>
+                }
               </div>
 
               {c.joined && (
@@ -48,22 +62,21 @@ export default function Challenges()
                     <span style={{ fontWeight:700 }}>{c.progress} / {c.target} {c.unit}</span>
                   </div>
                   <div style={{ height:6, background:C.bg, borderRadius:6, overflow:"hidden" }}>
-                    <div style={{ height:"100%", width:`${(c.progress/c.target)*100}%`, background:`linear-gradient(90deg,${C.brand},${C.brandDark})`, borderRadius:6 }} />
+                    <div style={{ height:"100%", width:`${Math.min((c.progress/c.target)*100,100)}%`, background:`linear-gradient(90deg,${C.brand},${C.brandDark})`, borderRadius:6 }} />
                   </div>
                 </div>
               )}
 
               <div style={{ background:C.bg, borderRadius:10, padding:"10px 12px" }}>
                 <div style={{ fontSize:10, fontWeight:700, color:C.muted, letterSpacing:"0.08em", marginBottom:8 }}>🏆 LEADERBOARD</div>
-                {c.leaderboard.map((p, i) => (
+                {c.leaderboard?.map((p, i) => (
                   <div key={p.name} style={{ display:"flex", alignItems:"center", gap:10, padding:"5px 0", borderBottom: i<c.leaderboard.length-1 ? `1px solid ${C.border}` : "none" }}>
-                    <span style={{ width:20, fontSize:14 }}>{["🥇","🥈","🥉","  "][i]}</span>
-                    <Av initials={p.avatar} size={24} bg={p.name.includes("Alex") ? C.brand : C.muted} />
-                    <div style={{ flex:1, fontSize:13, fontWeight: p.name.includes("Alex") ? 700 : 400 }}>{p.name}</div>
+                    <span style={{ width:20, fontSize:14 }}>{["🥇","🥈","🥉"][i] ?? ""}</span>
+                    <Av initials={p.avatar} size={24} bg={p.name === currentUser.name ? C.brand : C.muted} />
+                    <div style={{ flex:1, fontSize:13, fontWeight: p.name===currentUser.name ? 700 : 400 }}>{p.name}</div>
                     <div style={{ fontWeight:800, color:C.brand, fontSize:13 }}>{p.value} {c.unit}</div>
                   </div>
                 ))}
-                {/* PLACEHOLDER: GET /api/challenges/:id/leaderboard */}
               </div>
             </Card>
           ))}
@@ -71,4 +84,4 @@ export default function Challenges()
       </div>
     </div>
   );
-};
+}

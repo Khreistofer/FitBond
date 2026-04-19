@@ -1,6 +1,6 @@
-package com.example.demo.controller;
-import com.example.demo.Activity;
-import com.example.demo.service.ActivityService;
+package com.example.fitbond.controller;
+import com.example.fitbond.Activity;
+import com.example.fitbond.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
