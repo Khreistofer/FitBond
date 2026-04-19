@@ -1,7 +1,7 @@
-package com.example.demo.service;
+package com.example.fitbond.service;
 
-import com.example.demo.User;
-import com.example.demo.repository.UserRepository;
+import com.example.fitbond.User;
+import com.example.fitbond.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;

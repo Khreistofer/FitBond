@@ -16,6 +16,8 @@ public class User {
     private String username;
     @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false)
+    private String password;
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
     private int points = 0;
@@ -29,9 +31,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Activity> activities = new ArrayList<>();
     public User() {}
-    public User(String username_, String email_, LocalDateTime created_at_, LocalDateTime updated_at_) {
+    public User(String username_, String email_, String password_, LocalDateTime created_at_, LocalDateTime updated_at_) {
         this.username = username_;
         this.email = email_;
+        this.password = password_;
         this.created_at = created_at_;
         this.updated_at = updated_at_;
     }
@@ -89,4 +92,12 @@ public class User {
 
     public List<String> getBadges() { return badges; }
     public void setBadges(List<String> badges) { this.badges = badges; }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
